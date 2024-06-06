@@ -1,27 +1,16 @@
 import re
 
-import django
-try:
-    from django.core.urlresolvers import reverse, NoReverseMatch
-except ImportError:  # Django 2 detected :)
-    from django.urls import reverse, NoReverseMatch
+from django.urls import reverse, NoReverseMatch
 from django.template import Node, Library, TemplateSyntaxError, VariableDoesNotExist
 from django.template.loader import get_template
 from django.conf import settings
 from django.http import QueryDict
 from django.utils.html import mark_safe
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 
-# As of django 1.10, template rendering no longer accepts a context, but
-# instead accepts only accepts a dict. Up until django 1.8, a context was
-# actually required. Fortunately Context takes a single dict parameter,
-# so for django >=1.9 we can get away with just passing a unit function.
-if django.VERSION < (1, 9, 0):
-    from django.template import Context
-else:
-    def Context(x):
-        return x
+def Context(x):
+    return x
 
 
 register = Library()
@@ -67,10 +56,7 @@ def get_page_url(page_num, current_app, url_view_name, url_extra_args, url_extra
         except NoReverseMatch as e:  # Attempt to load view from application root, allowing the use of non-namespaced view names if your view is defined in the root application
             if settings.SETTINGS_MODULE:
 
-                if django.VERSION < (1, 9, 0):
-                    separator  = '.'
-                else:
-                    separator  = ':' # Namespace separator changed to colon after 1.8
+                separator = ":"  # Namespace separator changed to colon after 1.8
 
                 project_name = settings.SETTINGS_MODULE.split('.')[0]
                 try:
